@@ -23,21 +23,21 @@ print(dataset.shape)
 print(dataset.groupby('area_type')['area_type'].agg('count'))
 
 ## droping unnecessary columns
-dataset.drop(['area_type','society','availability'], axis='columns', inplace=True)
+dataset.drop(['area_type','society','availability','balcony'], axis='columns', inplace=True)
 print(dataset.shape)
 
 ## data cleaning
+
 print(dataset.isnull().sum())
 dataset.dropna(inplace=True)
 print(dataset.shape)
 
 ### data engineering
 print(dataset['size'].unique())
-dataset['bhk'] = dataset['size'].apply(lambda x: x.split(' ')[0])
-dataset.drop('size',axis=1, inplace=True)
+dataset['bhk'] = dataset['size'].apply(lambda x: float(x.split(' ')[0]))
 
 ### rearranging the columns
-dataset = dataset[['location','bhk','total_sqft','bath','balcony','price']]  
+dataset = dataset[['location','size','bhk','total_sqft','bath','price']]  
 
 ### exploring 'total_sqft' column
 print(dataset['total_sqft'].unique())
@@ -72,6 +72,7 @@ print(dataset['total_sqft'].head(10))
 print(dataset.loc[30])
 
 ## feature engineering
+
 print(dataset.head(10))
 
 ### creating new colomn 'price_per_sqft' as we know
@@ -99,6 +100,172 @@ print(location_stats_less_than_10)
 dataset['location'] = dataset['location'].apply(lambda x: 'other' if x in location_stats_less_than_10 else x)
 print(dataset['location'].head(10))
 print(len(dataset['location'].unique()))
+
+## Outlier detection and removal
+
+### checking that 'total_sqft'/'bhk', if it's very less than there is some
+### anomaly and we have to remove these outliers
+print(dataset[dataset['total_sqft'] / dataset['bhk'] < 300].sort_values(by='total_sqft').head(10))
+print(dataset.shape)
+
+dataset = dataset[~(dataset['total_sqft'] / dataset['bhk'] < 300)]
+print(dataset.shape)
+
+### checking columns where 'price_per_sqft' is very low
+### where it should not be that low, so it's an anomaly and 
+### we have to remove those rows
+print(dataset['price_per_sqft'].describe())
+
+### function to remove these extreme cases of very high or low values
+### of 'price_per_sqft' based on std()
+def remove_pps_outliers(df):
+    df_out = pd.DataFrame()
+    for key, subdf in df.groupby('location'):
+        mean = np.mean(subdf['price_per_sqft'])
+        std = np.std(subdf['price_per_sqft'])
+        reduced_df = subdf[(subdf['price_per_sqft'] > (mean - std)) & (subdf['price_per_sqft'] <= (mean + std))]
+        df_out = pd.concat([df_out, reduced_df], ignore_index=True)
+    return df_out
+
+dataset = remove_pps_outliers(dataset)
+print(dataset.shape)
+
+### plotting graoh where we can visualize that properties with same location
+### and the price of 3 bhk properties with higher 'total_sqft' is less than 
+### 2 bhk properties with lower 'total_sqft'
+def plot_scatter_chart(df,location):
+    bhk2 = df[(df['location'] == location) & (df['bhk'] == 2)]
+    bhk3 = df[(df['location'] == location) & (df['bhk'] == 3)]
+    matplotlib.rcParams['figure.figsize'] = (15,10)
+    plt.scatter(bhk2['total_sqft'], 
+                bhk2['price'], 
+                color='blue', 
+                label='2 BHK', 
+                s=50
+                )
+    plt.scatter(bhk3['total_sqft'], 
+                bhk3['price'], 
+                marker='+',
+                color='green', 
+                label='3 BHK', 
+                s=50
+                )
+    plt.xlabel('Total Square Feet Area')
+    plt.ylabel('Price')
+    plt.title(location)
+    plt.legend()
+    plt.show()
+
+plot_scatter_chart(dataset,"Hebbal")
+plot_scatter_chart(dataset,"Rajaji Nagar")
+
+### defining a funcion where we can get the rows where 'bhk' & 'location'
+### is same but the property with less 'bhk' have more price than the property
+### which have more 'bhk'. So, it's also an anomalu and we have to remove these 
+### properties
+def remove_bhk_outliers(df):
+    exclude_indices = np.array([])
+    for location, location_df in df.groupby('location'):
+        bhk_stats = {}
+        for bhk, bhk_df in location_df.groupby('bhk'):
+            bhk_stats[bhk] = {
+                    'mean': np.mean(bhk_df['price_per_sqft']),
+                    'std': np.std(bhk_df['price_per_sqft']),
+                    'count': bhk_df.shape[0]
+                }
+        for bhk, bhk_df in location_df.groupby('bhk'):
+            stats = bhk_stats.get(bhk-1)
+            if stats and stats['count'] > 5:
+                exclude_indices = np.append(exclude_indices, bhk_df[bhk_df['price_per_sqft'] < (stats['mean'])].index.values)
+    return df.drop(exclude_indices, axis='index')
+        
+dataset = remove_bhk_outliers(dataset)
+print(dataset.shape)
+            
+def plot_scatter_chart(df,location):
+    bhk2 = df[(df['location'] == location) & (df['bhk'] == 2)]
+    bhk3 = df[(df['location'] == location) & (df['bhk'] == 3)]
+    matplotlib.rcParams['figure.figsize'] = (15,10)
+    plt.scatter(bhk2['total_sqft'], 
+                bhk2['price'], 
+                color='blue', 
+                label='2 BHK', 
+                s=50
+                )
+    plt.scatter(bhk3['total_sqft'], 
+                bhk3['price'], 
+                marker='+',
+                color='green', 
+                label='3 BHK', 
+                s=50
+                )
+    plt.xlabel('Total Square Feet Area')
+    plt.ylabel('Price')
+    plt.title(location)
+    plt.legend()
+    plt.show()
+
+plot_scatter_chart(dataset,"Hebbal")
+plot_scatter_chart(dataset,"Rajaji Nagar")
+
+### histogram for properties per sqaure feet area
+matplotlib.rcParams['figure.figsize'] = (20,10)
+plt.hist(dataset['price_per_sqft'], rwidth=0.8)
+plt.xlabel('Price Per Square Feet')
+plt.ylabel('Count')
+plt.title('Histogram of Properties by Price Per Square Feet')
+plt.show()
+
+### exploring bathroom feature
+print(dataset['bath'].unique())
+
+#### having 10 bedrooms and bathroom > 10 is unusual
+#### so, we will remove these anomalies
+print(dataset[dataset['bath'] > 10])
+
+#### plotting histogram of bathroom 
+plt.hist(dataset['bath'], rwidth=0.8, color='red')
+plt.xlabel('Number of Bathrooms')
+plt.ylabel('Count')
+plt.title('Histogram of Bathroom per Property')
+plt.show()
+
+print(dataset[dataset['bath'] > dataset['bhk'] + 2])
+dataset = dataset[dataset['bath'] < dataset['bhk'] + 2]
+print(dataset.shape)
+
+### after removing outliers, dropping unwanted features
+dataset.drop(['size','price_per_sqft'], axis='columns', inplace=True)
+print(dataset.head())
+
+## one hot encoding the 'location' column
+dummies = pd.get_dummies(dataset['location'])
+print(dummies.head())
+
+dataset = pd.concat([dummies.drop('other', axis='columns'), dataset], axis='columns')
+dataset.drop('location', axis=1, inplace=True)
+print(dataset.head())
+print(dataset.shape)
+
+## distributing independent features in 'X' and dependent feature in 'y'
+X = dataset.iloc[:,:-1].values
+y = dataset.iloc[:,-1].values
+
+## splitting the dataset into training set and test set
+from sklearn.model_selection import train_test_split
+X_train,X_test,y_train,y_test = train_test_split(X,y,test_size=0.2,random_state=10)
+
+## training  the model
+from sklearn.linear_model import LinearRegression
+regressor = LinearRegression()
+regressor.fit(X_train,y_train)
+print(regressor.score(X_test,y_test))
+
+## k-fold cross validation
+from sklearn.model_selection import ShuffleSplit, cross_val_score
+cv = ShuffleSplit(n_splits=5, test_size = 0.2, random_state=0)
+cross_val_score(regressor,X,y,cv=cv)
+
 
 
 
