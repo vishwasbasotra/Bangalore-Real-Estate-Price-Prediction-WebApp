@@ -11,10 +11,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.rcParams["figure.figsize"] = (20,10)
-import tensorflow as tf
 
 # importing the dataset
-dataset = pd.read_csv('dataset\Bengaluru_House_Data.csv')
+dataset = pd.read_csv('..\dataset\Bengaluru_House_Data.csv')
 print(dataset.head(10))
 print(dataset.shape)
 
@@ -311,7 +310,11 @@ model_scores = find_best_model_using_gridsearch(X,y)
 print(model_scores)
 
 ### so after running grid search, linear regression model have the best score
-### so i will use linear regression model
+### so i will use linear regression model on the whole dataset
+
+from sklearn.linear_model import LinearRegression
+regressor = LinearRegression()
+regressor.fit(X,y)
 
 ## evaluating the model
 def predict_price(location,sqft,bath,bhk):
