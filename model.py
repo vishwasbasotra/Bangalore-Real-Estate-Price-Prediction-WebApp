@@ -36,9 +36,6 @@ print(dataset.shape)
 print(dataset['size'].unique())
 dataset['bhk'] = dataset['size'].apply(lambda x: float(x.split(' ')[0]))
 
-### rearranging the columns
-dataset = dataset[['location','size','bhk','total_sqft','bath','price']]  
-
 ### exploring 'total_sqft' column
 print(dataset['total_sqft'].unique())
 
@@ -242,14 +239,16 @@ print(dataset.head())
 dummies = pd.get_dummies(dataset['location'])
 print(dummies.head())
 
-dataset = pd.concat([dummies.drop('other', axis='columns'), dataset], axis='columns')
+dataset = pd.concat([dataset,dummies.drop('other', axis='columns')], axis='columns')
 dataset.drop('location', axis=1, inplace=True)
 print(dataset.head())
 print(dataset.shape)
 
 ## distributing independent features in 'X' and dependent feature in 'y'
-X = dataset.iloc[:,:-1].values
-y = dataset.iloc[:,-1].values
+X = dataset.drop(['price'],axis= 'columns')
+y = dataset['price']
+print(X.shape)
+print(y.shape)
 
 ## splitting the dataset into training set and test set
 from sklearn.model_selection import train_test_split
@@ -266,11 +265,69 @@ from sklearn.model_selection import ShuffleSplit, cross_val_score
 cv = ShuffleSplit(n_splits=5, test_size = 0.2, random_state=0)
 cross_val_score(regressor,X,y,cv=cv)
 
+## grid search, hyper parameter tuning
+from sklearn.model_selection import GridSearchCV
+from sklearn.linear_model import Lasso
+from sklearn.tree import DecisionTreeRegressor
 
+def find_best_model_using_gridsearch(X,y):
+    algos = {
+        'linear_regression': {
+            'model': LinearRegression(),
+            'params': { 'normalize': [True, False]}
+            },
+        'lasso': {
+            'model': Lasso(),
+            'params': {
+                'alpha': [1,2],
+                'selection': ['random','cyclic']
+                }
+            },
+        'decision_tree':{
+            'model': DecisionTreeRegressor(),
+            'params': {
+                'criterion': ['mse','friedman_mse'],
+                'splitter': ['best','random']
+                }
+            }
+        }
+    scores = []
+    cv = ShuffleSplit(n_splits=5,test_size=0.2,random_state=0)
+    for algo_name,config in algos.items():
+        gs = GridSearchCV(config['model'],
+                          config['params'],
+                          cv=cv,
+                          n_jobs=-1,
+                          return_train_score=False
+                          )
+        gs.fit(X,y)
+        scores.append({
+            'model': algo_name,
+            'best_score': gs.best_score_,
+            'best_params': gs.best_params_
+            })
+    return pd.DataFrame(scores,columns=['model','best_score','best_params'])
+model_scores = find_best_model_using_gridsearch(X,y)
+print(model_scores)
 
+### so after running grid search, linear regression model have the best score
+### so i will use linear regression model
 
+## evaluating the model
+def predict_price(location,sqft,bath,bhk):
+    loc_index = np.where(X.columns == location)[0][0]
+    
+    x = np.zeros(len(X.columns))
+    x[0] = sqft
+    x[1] = bath
+    x[2] = bhk
+    if loc_index >= 0:
+        x[loc_index] = 1
+    return regressor.predict([x])[0]
 
-
+print(predict_price('1st Phase JP Nagar',1000,2,2))
+print(predict_price('1st Phase JP Nagar',1000,3,3))
+print(predict_price('Indira Nagar',1000,3,3))
 
 
 
