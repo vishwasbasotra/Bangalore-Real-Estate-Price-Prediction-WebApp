@@ -329,6 +329,16 @@ print(predict_price('1st Phase JP Nagar',1000,2,2))
 print(predict_price('1st Phase JP Nagar',1000,3,3))
 print(predict_price('Indira Nagar',1000,3,3))
 
+# saving the model
+import pickle
+with open('bangalore_home_prices_model.pickle','wb') as f:
+    pickle.dump(regressor,f)
+
+# exporting columns
+import json
+columns = {'data_columns': [col.lower() for col in X.columns]}
+with open("columns.json","w") as f:
+    f.write(json.dumps(columns))
 
 
 
