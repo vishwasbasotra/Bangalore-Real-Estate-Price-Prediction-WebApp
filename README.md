@@ -1,5 +1,5 @@
 # Bangalore Real Estate Price Prediction WebApp
-This Model/WebApp predicts real estate price. We will first build a model using sklearn and linear regression using banglore home prices dataset from kaggle.com. Second step would be to write a python flask server that uses the saved model to serve http requests. Third component is the website built in html, css and javascript that allows user to enter home square ft area, bedrooms etc and it will call python flask server to retrieve the predicted price. During model building we will cover almost all data science concepts such as data load and cleaning, outlier detection and removal, feature engineering, dimensionality reduction, gridsearchcv for hyperparameter tunning, k fold cross validation etc.
+This Model/WebApp predicts real estate price in Bangalore. We will first build a model using sklearn and linear regression using banglore home prices dataset from kaggle.com. Second step would be to write a python flask server that uses the saved model to serve http requests. Third component is the website built in html, css and javascript that allows user to enter home square ft area, bedrooms etc and it will call python flask server to retrieve the predicted price. During model building we will cover almost all data science concepts such as data load and cleaning, outlier detection and removal, feature engineering, dimensionality reduction, gridsearchcv for hyperparameter tunning, k fold cross validation etc.
 
 ![image](WebApp.png)
 ## Technologies used:
@@ -10,3 +10,6 @@ This Model/WebApp predicts real estate price. We will first build a model using 
 5. Jupyter notebook, visual studio code and pycharm as IDE
 6. Python flask for http server
 7. HTML/CSS/Javascript for UI
+
+## Deployment:
+This Web App is deployed to cloud (AWS EC2) where it can be accesssed. Running last command above will prompt that server is running on port 5000. 8. Now just load your cloud url in browser (for me it was http://ec2-3-20-226-15.us-east-2.compute.amazonaws.com/), website will open but it will not work unless I run this app's server in virtual OS Ubuntu.
