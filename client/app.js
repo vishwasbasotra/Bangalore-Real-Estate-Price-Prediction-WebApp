@@ -52,7 +52,8 @@ function onClickedEstimatePrice() {
   //var url = "/api/predict_home_price";
 
   $.post(
-    url, {
+    url,
+    {
       total_sqft: sqft,
       bhk: bhk,
       bath: bathrooms,
