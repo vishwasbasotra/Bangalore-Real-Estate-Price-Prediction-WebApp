@@ -31,6 +31,10 @@
             left: 0;
             z-index: -1;
         }
+
+        .navbar-light .navbar-brand {
+            font-size: 40px;
+        }
     </style>
 
     <!-- Favicon -->
@@ -41,6 +45,9 @@
 
 <body>
     <div class="img"></div>
+    <nav class="navbar navbar-inverse navbar-light navbar-fixed-top">
+        <a href="{{url_for('index')}}" class="navbar-brand">Home Page</a>
+    </nav>
     <h1 class="display-2 test-center font-weight-light text-center text-dark" style="margin-top: 100px;">Estimated Price
         of the Property:</h1>
     <div class="jumbotron text-center">
