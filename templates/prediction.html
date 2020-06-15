@@ -10,7 +10,7 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
 
     <!-- Custom CSS -->
     <style>
@@ -37,9 +37,16 @@
         }
 
         #heading1 {
-            margin-top: 100px;
+            margin-top: 120px;
+            font-size: 80px;
+            font-weight: 300;
+            text-align: center;
         }
 
+        #heading2 {
+            font-size: 50px;
+            font-weight: 400;
+        }
 
         @media only screen and (max-width: 414px) {
             .img {
@@ -62,17 +69,19 @@
 
             .navbar-light .navbar-brand {
                 font-size: 25px;
+                font-weight: 500;
             }
 
             #heading1 {
-                margin-top: 60px;
-                font-size: 40px;
+                margin-top: 120px;
+                font-size: 45px;
+                font-weight: 400;
+                text-align: center;
             }
 
             #heading2 {
                 font-size: 40px;
             }
-
         }
 
         @media only screen and (max-width: 375px) {
@@ -100,7 +109,9 @@
 
             #heading1 {
                 margin-top: 120px;
-                font-size: 40px;
+                font-size: 45px;
+                font-weight: 400;
+                text-align: center;
             }
 
             #heading2 {
@@ -153,10 +164,13 @@
     <nav class="navbar navbar-inverse navbar-light navbar-fixed-top">
         <a href="{{url_for('index')}}" class="navbar-brand">Home Page</a>
     </nav>
-    <h1 id="heading1" class="display-2 test-center font-weight-light text-center text-dark">Estimated Price of the
-        Property:</h1>
+    <h1 id="heading1">
+        Estimated Price of the Property:
+    </h1>
     <div class="jumbotron text-center">
-        <h1 id="heading2" class="display-4 test-center text-danger">{{result}}</h1>
+        <h1 id="heading2" class="text-danger">
+            {{result}}
+        </h1>
     </div>
 </body>
 
