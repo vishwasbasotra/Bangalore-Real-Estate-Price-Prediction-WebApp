@@ -1,7 +1,10 @@
+from asyncio.log import logger
 from flask import Flask, request, url_for, render_template
 import pickle
 import numpy as np
 import json
+from db.conn import database
+from db.dbmodels import HouseData, SignIn
 
 app = Flask(__name__)
 
@@ -24,7 +27,13 @@ def get_estimated_price(input_json):
     x[2] = input_json['bhk']
     if loc_index >= 0:
         x[loc_index] = 1
-    result = round(model.predict([x])[0],2)
+    x = round(model.predict([x])[0],2)
+    if x<50:
+        result = x-15
+    elif 60<x<100:
+        result = x-30
+    elif x>100:
+        result = x-45
     return result
 
 def get_location_names():
@@ -43,6 +52,16 @@ def load_saved_artifacts():
 @app.route("/")
 def index():
     return render_template('index.html')
+
+# @app.route("/users")
+# def signin(req_json: SignIn):
+#     try:
+#         result = database().sign_log(req_json)
+#         return result
+#     except Exception as e:
+#         logger.error("Exception in signing or logging in {e}")
+#         return "Error"
+
 
 
 @app.route("/prediction", methods=["POST"])
@@ -65,7 +84,29 @@ def prediction():
 
     return render_template('prediction.html', result=result)
 
+@app.route("/add", methods=['GET','POST'])
+def insert_data():
+    if request.method == 'POST':
+        input_json = {
+            "name": request.form['iName'],
+            "phone": request.form['iNum'],
+            "area": request.form['iSqft'],
+            "bhk": request.form['iBHK'],
+            "bath": request.form['iBathrooms'],
+            "location": request.form['sLocation'],
+            "price": request.form['Price']
+        }
+        result = database().insert_house_data(input_json)
+        return render_template('data.html', result = result)
+
+# @app.route("/houses", methods=['GET', 'POST'])
+# def display_house_data():
+
+
 if __name__ == "__main__":
     print("Starting Python Flask Server")
     load_saved_artifacts()
     app.run(debug=True)
+
+
+
