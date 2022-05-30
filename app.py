@@ -1,4 +1,5 @@
 from asyncio.log import logger
+from unittest import result
 from flask import Flask, request, url_for, render_template
 import pickle
 import numpy as np
@@ -99,8 +100,15 @@ def insert_data():
         result = database().insert_house_data(input_json)
         return render_template('data.html', result = result)
 
-# @app.route("/houses", methods=['GET', 'POST'])
-# def display_house_data():
+@app.route("/houses", methods=['GET', 'POST'])
+def display_house_data():
+    if request.method == 'POST':
+        input_json = {
+            "location": request.form['nLocation']
+        }
+    final_data = database().fetch_house_data(input_json)
+    return render_template('houses.html', result = final_data)
+    
 
 
 if __name__ == "__main__":

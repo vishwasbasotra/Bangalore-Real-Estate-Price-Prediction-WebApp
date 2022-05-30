@@ -4,9 +4,37 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>House Data</title>
 </head>
 <body>
-    
+    <h1 style="color: white; background-color: rgba(54, 65, 165, 0.466);"><b><i>Available Houses</i></b></h1>
+<table class="table">
+    <thead>
+      <tr>
+        <th scope="col" style="color: black;">Owner Name</th>
+        <th scope="col" style="color: black;">Phone Number</th>
+        <th scope="col" style="color: black;">Area of property</th>
+        <th scope="col" style="color: black;">BHK</th>
+        <th scope="col" style="color: black;">Bathrooms</th>
+        <th scope="col" style="color: black;">Location</th>
+        <th scope="col" style="color: black;">Price</th>
+      </tr>
+    </thead>
+    {% for house in result %}
+    <tbody>
+    <tr>
+        <td style="color: black;">{{ house['name'] }}</td>
+        <td style="color: black;">{{ house['phone'] }}</td>
+        <td style="color: black;">{{ house['area'] }}</td>
+        <td style="color: black;">{{ house['bhk'] }}</td>
+        <td style="color: black;">{{ house['bath'] }}</td>
+        <td style="color: black;">{{ house['location'] }}</td>
+        <td style="color: black;">{{ house['price'] }}</td>
+    </tr>
+    </tbody>
+    {% endfor %}
+</table>
+
+
 </body>
 </html>
