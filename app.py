@@ -30,11 +30,11 @@ def get_estimated_price(input_json):
         x[loc_index] = 1
     x = round(model.predict([x])[0],2)
     if x<50:
-        result = x-15
-    elif 60<x<100:
-        result = x-30
+        result = x-10
+    elif 50<x<100:
+        result = x-20
     elif x>100:
-        result = x-45
+        result = x-30
     return result
 
 def get_location_names():
