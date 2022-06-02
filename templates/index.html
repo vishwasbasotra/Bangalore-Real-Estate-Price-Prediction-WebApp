@@ -872,6 +872,17 @@
             <input href="/houses" class="submit" type="submit" value="Search Property" onclick="display_house_data()"/>
         </form>
     </div>
+    <div class="container text-center">
+        <h1>Sold your property?</h1>
+        <form class="form" action="{{url_for('remove_house_data')}}" method="POST" autocomplete="off">
+            <h2>Phone Number</h2>
+            <div>
+                <input required aria-required="true" type="number" class="num" id="iNum" class="floatLabel"
+                name="iNumber" placeholder="9836321345" />
+            </div>
+            <input href="/remove" class="submit" type="submit" value="Remove Property" onclick="remove_house_data()"/>
+        </form>
+    </div>
 
 </body>
 

@@ -1,4 +1,5 @@
 from asyncio.log import logger
+# from crypt import methods
 from unittest import result
 from flask import Flask, request, url_for, render_template
 import pickle
@@ -109,7 +110,14 @@ def display_house_data():
     final_data = database().fetch_house_data(input_json)
     return render_template('houses.html', result = final_data)
     
-
+@app.route("/remove", methods=['GET', 'POST'])
+def remove_house_data():
+    if request.method == 'POST':
+        input_json = {
+            "number": request.form['iNumber']
+        }
+    result = database().archive_house_data(input_json)
+    return render_template('data.html', result=result)
 
 if __name__ == "__main__":
     print("Starting Python Flask Server")

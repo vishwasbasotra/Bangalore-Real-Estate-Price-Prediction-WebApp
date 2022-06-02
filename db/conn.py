@@ -100,6 +100,18 @@ class database:
             return result
         except Exception as e:
             raise Exception(f"Failed to fetch data: {e}")
+    def archive_house_data(self, input_json):
+        number = input_json['number']
+        cursor = self.db.cursor()
+        query = f"""UPDATE houses SET status = 0 WHERE phone = {number}"""
+        try:
+            cursor.execute(query)
+            self.db.commit()
+            res = "Details removed successfully"
+        except Exception as e:
+            self.db.rollback()
+            res = f"Error in removing details {e}"
+        return res
 
 
 
