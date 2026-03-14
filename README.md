@@ -15,7 +15,7 @@ Web App Link (AWS EC2) - http://ec2-3-20-226-15.us-east-2.compute.amazonaws.com/
 4. Sklearn for model building
 5. Jupyter notebook, visual studio code and pycharm as IDE
 6. Python flask for http server
-7. HTML/CSS/Javascript for UI
+7. HTML/CSS/Javascript for UI and UX
 
 ## License and Copyright
 © Vishwas Basotra
